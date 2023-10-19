@@ -1,0 +1,173 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Compfa-rotate-270{% endblock title %}
+
+{% block stylesheets %}
+<link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css ' %}" rel="stylesheet">
+<link href="{% static 'css/pagination_buttons.css ' %}" rel="stylesheet">
+
+{% endblock stylesheets %}
+
+{% block heading %}Compras{% endblock heading %}
+
+{% block content %}
+    <!-- Tabla de datos -->
+    <div class="card shadow mb-12">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Compras</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th style="width:5%">#</th>
+                            <th style="width:15%">ID</th>
+                            <th style="width:25%">Fecha</th>
+                            <th style="width:20%">Proveedor</th>
+                            <th class="text-center" style="width:10%">Total</th>
+                            <th class="text-center" style="width:10%">Accciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in buys %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{b.id}}</td>
+                            <td>{{b.opening_date}}</td>
+                            <td>{{b.shoppinglist.supplier.get_full_name}}</td>
+                            <td class="text-right" >{{b.grand_total}}</td>
+                            <td class="text-center">
+                                <!--Vistas-->
+                                <a href="{% url 'Apps.buys:bought_products' b.id %}" class="text-decoration-none">
+                                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="tooltip" title="Ver ventas">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.colVis.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.print.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var totalDebts = 0;
+        tblCategories = $('#dataTable').DataTable({
+            dom: 'Bfrtip', // Los botones se dibujan en este elemento.
+            buttons: [
+                {
+                extend: 'print',
+                text: 'Imprimir <i class="fas fa-file ml-2"></i>',
+                titleAttr: 'Imprimir',
+                className: 'btn btn-info',
+                exportOptions: {
+                    columns: [ 0, 1, 2, 3 , 4]
+                },
+                customize: function (win) {
+                    // Calcular la suma de deudas desde los datos de la tabla
+                    var totalDebts = tblCategories.column(4).data().reduce(function (a, b) {
+                        return a + parseFloat(b);
+                    }, 0);
+                    // Agregar una fila al final del contenido con el total de deudas
+                    var lastRow = $('<tr>').append(
+                        $('<td>').html(''), 
+                        $('<td>').html(''), 
+                        $('<td>').html(''), 
+                        $('<td>').html('Total de Deudas:'),
+                        $('<td>').html(totalDebts.toFixed(2))
+                    ).appendTo($(win.document.body).find('table'));
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: 'Descargar Excel <i class="fas fa-file-excel ml-2"></i>',
+                    titleAttr: 'Descargar Excel',
+                    className: 'btn btn-success ml-2',
+                    exportOptions: {
+                        columns: [ 0, 1, 2, 3 , 4]
+                    } 
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: 'Descargar PDF <i class="fas fa-file-pdf ml-2"></i>',
+                    titleAttr: 'Descargar PDF',
+                    className: 'btn btn-danger ml-2',
+                    download: 'open',
+                    orientation: 'vertical',
+                    pageSize: 'A4',
+                    title: '*',
+                    exportOptions: {
+                        columns: [ 0, 1, 2, 3 , 4]
+                    },
+                    customize: function (doc) {
+                        doc.styles = {
+                            header: {
+                                fontSize: 18,
+                                bold: true,
+                                alignment: 'center'
+                            },
+                            subheader: {
+                                fontSize: 13,
+                                bold: true
+                            },
+                            quote: {
+                                italics: true
+                            },
+                            small: {
+                                fontSize: 8
+                            },
+                            tableHeader: {
+                                bold: true,
+                                fontSize: 11,
+                                color: 'white',
+                                fillColor: '#2d4154',
+                                alignment: 'center'
+                            }
+                        };
+                        doc.content[1].table.widths = ['5%', '5%','30%', '30%','20%'];
+                        doc.content[1].margin = [0, 35, 0, 0];
+                        doc.content[1].layout = {};
+
+                    // Calcular la suma de deudas desde los datos de la tabla
+                    var totalDebts = tblCategories.column(4).data().reduce(function (a, b) {
+                        return a + parseFloat(b);
+                        }, 0);
+
+                        doc.content[1].table.body.push(['','', '', 'Total de Compras:', totalDebts.toFixed(2)]);
+                }
+            }
+            ],
+            deferRender: true,
+            columnDefs: [
+                {
+                    targets: [0],
+                    visible: false,
+                    searchable: false,
+                },
+                {
+                    targets: [-1], 
+                    orderable: false, 
+                }
+            ],
+        });
+    });
+    // Alerta al intentar eliminar un cliente
+</script>
+{% endblock javascripts %}

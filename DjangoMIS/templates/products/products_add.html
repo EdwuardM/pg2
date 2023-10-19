@@ -1,0 +1,108 @@
+{% extends "pos/base.html" %}
+
+{% block title %}Agregar producto{% endblock title %}
+
+{% block stylesheets %}
+{% load static %}
+<link href="{% static 'css/style22.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% endblock stylesheets %}
+
+{% block heading %}Agregar producto{% endblock heading %}
+
+{% block content %}
+<!--Volver-->
+<div class="row ml-0" style="display: flex; justify-content: flex-start;">
+    <a href="{% url 'Apps.products:products_list' %}" style="margin-right: 2%; margin-bottom: 1.5%;">
+        <button type="button" class="btn btn-info font-weight-bold" >
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+    <a href="{% url 'Apps.products:rulesupply_add' %}">
+        <button type="button" class="btn btn-success font-weight-bold">
+                <i class="fas fa-plus mr-2"></i>
+                Agregar Regla de Abastecimiento
+        </button>
+    </a>
+</div>
+<div class="row">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.products:products_add' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputDescription">Nombre</label>
+                        <input type="text" class="form-control" name="name" placeholder="Jet bond..." required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="state">Estado</label>
+                        <select name="state" class="form-control" required>
+                            {% for status in product_status %}
+                            <option value="{{status.0}}">{{status.1}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputDescription">Descripción</label>
+                        <input type="text" name="description" class="form-control" placeholder="Masilla plastica de la marca sherwin williams..." required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputQuantity">Cantidad</label>
+                        <input type="number" name="quantity" step="any" class="form-control" placeholder="18" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="category">Categoría</label>
+                        <select name="category" class="form-control" required>
+                            <option value="" selected disabled hidden>Selecciona la categoría</option>
+                            {% for category in categories %}
+                            <option value="{{category.id}}">{{category.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="warehouse">Almacén</label>
+                        <select name="warehouse" class="form-control" required>
+                            <option value="" selected disabled hidden>Selecciona el almacén</option>
+                            {% for warehouse in warehouses %}
+                            <option value="{{warehouse.id}}">{{warehouse.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="inputPrice_buy">Precio Compra</label>
+                        <input type="number" name="price_buy" step="any" class="form-control" placeholder="7.99" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputPrice">Precio</label>
+                        <input type="number" name="price" step="any" class="form-control" placeholder="10.99" required>
+                    </div>
+                </div>
+                <div id="file-photo">
+                    <img id="preview-image" alt="Archivo binario" src="{% static 'agregar.png' %}">
+                    <div id="image-options-container">
+                        <div id="image-options" class="hidden-options">
+                            <span id="add-option"><i class="fas fa-plus-circle"></i></span>
+                            <span id="remove-option"><i class="fas fa-trash-alt"></i></span>
+                        </div>
+                    </div>
+                    <input type="file" id="image-input" name="imagen" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn btn-success font-weight-bold">Crear producto</button>
+            </form>            
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'js/photoAddPro.js' %}"></script>
+{% endblock javascripts %}
+

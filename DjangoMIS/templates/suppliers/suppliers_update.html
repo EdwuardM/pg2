@@ -1,0 +1,114 @@
+{% extends "pos/base.html" %}
+
+{% block title %}Actualizar proveedor{% endblock title %}
+
+{% block stylesheets %}
+<style>
+    .rating {
+        font-size: 30px;
+    }
+    
+    .star {
+        cursor: pointer;
+        color: gray;
+    }
+    
+    .star:hover {
+        color: gold;
+    }
+    </style>
+{% endblock stylesheets %}
+
+{% block heading %}Actualizar proveedor{% endblock heading %}
+
+{% block content %}
+<!--Volver-->
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.suppliers:suppliers_list' %}">
+        <button type="button" class="btn btn-info font-weight-bold">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+<div class="row">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.suppliers:suppliers_update' supplier.id %}"  method="post">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Nombre</label>
+                        <input type="text" class="form-control" name="first_name" value="{{supplier.first_name}}" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Empresa</label>
+                        <input type="text" class="form-control" name="company_name" value="{{supplier.company_name}}" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{supplier.email}}" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Telefono</label>
+                        <input type="text" name="phone" class="form-control" value="{{supplier.phone}}" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="inputDescription">Direccion</label>
+                        <textarea name="address" class="form-control" rows="2" required>{{supplier.address}}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputDescription">Calificación</label>
+                    <div class="rating">
+                        <span class="star" data-rating="1">&#9733;</span>
+                        <span class="star" data-rating="2">&#9733;</span>
+                        <span class="star" data-rating="3">&#9733;</span>
+                        <span class="star" data-rating="4">&#9733;</span>
+                        <span class="star" data-rating="5">&#9733;</span>
+                    </div>
+                    <input type="hidden" name="rating" id="rating"  value="{{ supplier.assessment }}">
+                    <p>Valor de la calificación: {{ supplier.assessment }}</p> 
+                </div>                
+                <button type="submit" class="btn btn-success font-weight-bold">Actualizar proveedor</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    const stars = document.querySelectorAll(".star");
+    const ratingInput = document.getElementById("rating");
+    
+    // Obtén el valor de calificación existente
+    const existingRating = parseInt(ratingInput.value);
+    
+    // Llama a la función para establecer el color de las estrellas
+    updateStars(existingRating);
+    
+    stars.forEach((star) => {
+        star.addEventListener("click", () => {
+            const rating = parseInt(star.getAttribute("data-rating"));
+            ratingInput.value = rating;
+            updateStars(rating);
+        });
+    });
+    
+    function updateStars(rating) {
+        stars.forEach((star) => {
+            const starRating = parseInt(star.getAttribute("data-rating"));
+            if (starRating <= rating) {
+                star.style.color = "gold";
+            } else {
+                star.style.color = "gray";
+            }
+        });
+    }
+</script>
+{% endblock javascripts %}

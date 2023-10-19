@@ -1,0 +1,84 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Agregar Regla de abastecimiento{% endblock title %}
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block heading %}Agregar Regla de abastecimiento{% endblock heading %}
+
+{% block content %}
+<!--Volver-->
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.products:products_add' %}">
+        <button type="button" class="btn btn-info font-weight-bold">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+
+
+<div class="row">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.products:rulesupply_add' %}"  method="post" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputPrice">Cantidad Minima</label>
+                        <input type="number" name="minimum_amount" step="any" class="form-control" placeholder="1" required>
+                    </div>
+                    <div class="form-group col-md-8">
+                        <label for="inputPrice">Cantidad Maxima</label>
+                        <input type="number" name="maximum_quantity" step="any" class="form-control" placeholder="100" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="supplier">Proveedor</label>
+                        <select name="supplier" class="form-control" required>
+                            <option value="" selected disabled hidden>Selecciona al proveedor</option>
+                            {% for supplier in suppliers %}
+                            <option value="{{supplier.id}}">{{supplier.get_full_name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success font-weight-bold">Crear Regla de abastecimiento</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
+<script src="{% static 'assets/bootstrap-touchspin-master/src/jquery.bootstrap-touchspin.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.15/dist/sweetalert2.all.min.js"></script>
+<script>
+
+function validateForm() {
+    var minimumAmount = parseFloat(document.getElementsByName("minimum_amount")[0].value);
+    var maximumQuantity = parseFloat(document.getElementsByName("maximum_quantity")[0].value);
+
+    if (minimumAmount <= 0) {
+        Swal.fire({
+            title: 'La cantidad mínima debe ser mayor que 0.',
+            icon: 'warning',
+        });
+        return false;
+    }
+    
+    if (maximumQuantity <= minimumAmount) {
+        Swal.fire({
+            title: 'La cantidad máxima debe ser mayor que la cantidad mínima.',
+            icon: 'warning',
+        });
+        return false;
+    }
+
+    return true;
+}
+
+</script>
+{% endblock javascripts %}

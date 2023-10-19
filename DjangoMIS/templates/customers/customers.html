@@ -1,0 +1,232 @@
+{% extends "pos/base.html" %}
+{% load static %}
+
+{% block title %}Clientes{% endblock title %}
+
+{% block stylesheets %}
+<link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css ' %}" rel="stylesheet">
+<link href="{% static 'css/pagination_buttons.css ' %}" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block heading %}Clientes{% endblock heading %}
+
+{% block content %}
+    <!-- Crear nuevo cliente -->
+    <div class="row ml-0 mb-3">
+        <a href="{% url 'Apps.customers:customers_add' %}">
+            <button type="button" class="btn btn-success font-weight-bold">
+                    <i class="fas fa-plus mr-2"></i>
+                    Crear nuevo cliente
+            </button>
+        </a>
+    </div>
+    <!-- Tabla de datos -->
+    <div class="card shadow mb-12">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Clientes</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th style="width:5%">#</th>
+                            <th style="width:20%">Nombre</th>
+                            <th style="width:15%">Telefono</th>
+                            <th style="width:25%">Direccion</th>
+                            <th style="width:15%">Deuda</th>
+                            <th class="text-center" style="width:10%">Accciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in customers %}
+                        <tr>
+                            <td>{{c.id}}</td>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{c.get_full_name}}</td>
+                            <td>{{c.phone}}</td>
+                            <td>{{c.address}}</td>
+                            <td>{{c.debts}}</td>
+                            <td class="text-center">
+                                <!--Actualizar-->
+                                <a href="{% url 'Apps.customers:customers_update' c.id %}" class="text-decoration-none">
+                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" title="Actualizar cliente">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                </a>
+                                <!--Eliminar modal-->
+                                <!-- Boton trigger modal -->
+                                <a class="text-decoration-none">
+                                    <button rel="delete" type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModal">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </a>
+                                <a href="{% url 'Apps.customers:customers_details' c.id %}" class="text-decoration-none">
+                                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="tooltip" title="Ver Deuda">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </a>
+                                <!-- Modal -->
+                                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Eliminar cliente</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div id="updateThisText" class="modal-body">
+                                            ¿Está seguro de que desea eliminar el cliente: {{c.name}} ?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                            <a id="updateThisURL" href="{% url 'Apps.customers:customers_delete' c.id %}" class="text-decoration-none">
+                                                <button type="button"  class="btn btn-danger">Eliminar</button>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.colVis.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.print.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var totalDebts = 0;
+        tblCategories = $('#dataTable').DataTable({
+            dom: 'Bfrtip', // Los botones se dibujan en este elemento.
+            buttons: [
+                {
+                extend: 'print',
+                text: 'Imprimir <i class="fas fa-file ml-2"></i>',
+                titleAttr: 'Imprimir',
+                className: 'btn btn-info',
+                exportOptions: {
+                    columns: [ 0, 1, 2, 3 , 4, 5 ]
+                },
+                customize: function (win) {
+                    // Calcular la suma de deudas desde los datos de la tabla
+                    var totalDebts = tblCategories.column(5).data().reduce(function (a, b) {
+                        return a + parseFloat(b);
+                    }, 0);
+                    // Agregar una fila al final del contenido con el total de deudas
+                    var lastRow = $('<tr>').append(
+                        $('<td>').html(''), 
+                        $('<td>').html(''), 
+                        $('<td>').html(''), 
+                        $('<td>').html(''), 
+                        $('<td>').html('Total de Deudas:'),
+                        $('<td>').html(totalDebts.toFixed(2))
+                    ).appendTo($(win.document.body).find('table'));
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: 'Descargar Excel <i class="fas fa-file-excel ml-2"></i>',
+                    titleAttr: 'Descargar Excel',
+                    className: 'btn btn-success ml-2',
+                    exportOptions: {
+                        columns: [ 0, 1, 2, 3 , 4, 5 ]
+                    } 
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: 'Descargar PDF <i class="fas fa-file-pdf ml-2"></i>',
+                    titleAttr: 'Descargar PDF',
+                    className: 'btn btn-danger ml-2',
+                    download: 'open',
+                    orientation: 'vertical',
+                    pageSize: 'A4',
+                    title: '*',
+                    exportOptions: {
+                        columns: [ 0, 1, 2, 3 ,4, 5 ]
+                    },
+                    customize: function (doc) {
+                        doc.styles = {
+                            header: {
+                                fontSize: 18,
+                                bold: true,
+                                alignment: 'center'
+                            },
+                            subheader: {
+                                fontSize: 13,
+                                bold: true
+                            },
+                            quote: {
+                                italics: true
+                            },
+                            small: {
+                                fontSize: 8
+                            },
+                            tableHeader: {
+                                bold: true,
+                                fontSize: 11,
+                                color: 'white',
+                                fillColor: '#2d4154',
+                                alignment: 'center'
+                            }
+                        };
+                        doc.content[1].table.widths = ['5%', '5%', '30%', '30%', '20%', '10%'];
+                        doc.content[1].margin = [0, 35, 0, 0];
+                        doc.content[1].layout = {};
+
+                    // Calcular la suma de deudas desde los datos de la tabla
+                        var totalDebts = tblCategories.column(5).data().reduce(function (a, b) {
+                        return a + parseFloat(b);
+                        }, 0);
+
+                        doc.content[1].table.body.push(['', '', '', '', 'Total de Deudas:', totalDebts.toFixed(2)]);
+                }
+            }
+            ],
+            deferRender: true,
+            columnDefs: [
+                {
+                    targets: [0],
+                    visible: false,
+                    searchable: false,
+                },
+                {
+                    targets: [-1], 
+                    orderable: false, 
+                }
+            ],
+        });
+    });
+    // Alerta al intentar eliminar un cliente
+    $('#dataTable tbody')
+    // Evento cuando intentamos eliminar un cliente
+    // Actualizamos el texto y href del botón de eliminación modal
+    .on('click', 'button[rel="delete"]', function () {
+    // variable de fila
+    var tr = tblCategories.cell($(this).closest('td, li')).index();
+    row_data = ( tblCategories.row(tr.row).data());
+    customer_id = row_data[0];
+    customer_name = row_data[2]
+    new_delete_url  = 'delete/' + customer_id;
+    document.getElementById("updateThisText").innerHTML = "¿Estás seguro de que deseas eliminar el cliente:  " + customer_name + "?";
+    document.getElementById("updateThisURL").href=new_delete_url;
+    });
+</script>
+{% endblock javascripts %}

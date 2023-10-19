@@ -1,0 +1,53 @@
+{% extends "pos/base.html" %}
+
+{% block title %}Actualizar cliente{% endblock title %}
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block heading %}Actualizar cliente{% endblock heading %}
+
+{% block content %}
+<!--Volver-->
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.customers:customers_list' %}">
+        <button type="button" class="btn btn-info font-weight-bold">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+<div class="row">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.customers:customers_update' customer.id %}"  method="post">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Nombre</label>
+                        <input type="text" class="form-control" name="first_name" value="{{customer.first_name}}" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Apellido</label>
+                        <input type="text" class="form-control" name="last_name" value="{{customer.last_name}}" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Telefono</label>
+                        <input type="text" name="phone" class="form-control" value="{{customer.phone}}" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="inputDescription">Direccion</label>
+                        <textarea name="address" class="form-control" rows="2" required>{{customer.address}}</textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success font-weight-bold">Actualizar cliente</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}{% endblock javascripts %}

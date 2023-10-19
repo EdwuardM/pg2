@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo de venta PDF</title>
+    <style>
+        * {
+            color: black;
+        }
+
+        body {
+            font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            color: black;
+            font-size: 10px;
+        }
+
+        .name-company {
+            font-size: 25px;
+            padding: 5px;
+            margin-top: 5px;
+            margin-bottom: 0 ;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        table thead tr th {
+            border: 1px solid red !important;
+            padding: 3px;
+        }
+
+        table tbody tr td {
+            border: 1px solid red;
+            padding: 3px;
+        }
+        .pr-2{
+            font-size: 14px;
+        }
+        p {
+        margin: 0 !important;
+            }
+        .img-logo {
+            margin-top: 10px;
+            width: 75px;
+            height: 75px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <table style="width: 100%;" class="firts-block">
+            <tr >
+                <td class="chales">
+                    <p class="name-company"><b>ED-CAR</b></p>
+                    <p><b>2da av a 2-43 Zona 4</b></p>
+                    <p><b>La esperanza, Quetzaltenango</b></p>
+                    <p><b>Telefono:</b> (502) 56544910</p>
+                </td>
+                <td>
+                    <p><b>Fecha:</b> {{sale.date_added}}</p>
+                    <p><b>Codigo de Venta:</b> {{sale.id}}</p>
+                    <p><b>Cliente:</b> {{sale.customer.get_full_name}}</p>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <!--Tabla de productos-->
+        <table class="table" style="width: 50%;">
+            <thead>
+            <tr style="border: 1px solid black;">
+                <th style="width: 5%;" class="text-center pr-2">#</th>
+                <th style="width: 50%;" class="text-left pr-2">Producto</th>
+                <th style="width: 10%;" class="text-center pr-2">Cantidad</th>
+                <th style="width: 20%;" class="text-right pr-2">Precio</th>
+                <th style="width: 20%;" class="text-right pr-2">Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for d in details %}
+                <tr>
+                    <td class="text-center pr-2">{{forloop.counter}}</td>
+                    <td class="text-left pr-2 ">{{d.product.name}}</td>
+                    <td class="text-center pr-2">{{d.quantity}}</td>
+                    <td class="text-right pr-2 ">Q. {{d.price}}</td>
+                    <td class="text-right pr-2">Q. {{d.total_detail}}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="4" class="text-right pr-2"><b>Subtotal</b></td>
+                <td class="text-right pr-2">Q. {{sale.sub_total|floatformat:2}}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right pr-2"><b>Descuento({{sale.tax_percentage}}%)</b></td>
+                <td class="text-right pr-2">Q. {{sale.tax_amount|floatformat:2}}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right pr-2"><b>Gran total</b></td>
+                <td class="text-right pr-2">Q. {{ sale.grand_total }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right pr-2"><b>Cantidad pagada</b></td>
+                <td class="text-right pr-2">Q. {{ sale.amount_payed }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right pr-2"><b>Cambio</b></td>
+                <td class="text-right pr-2">Q. {{ sale.amount_change }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 18px; text-align: center;">
+            <b>¡Gracias por su preferencia!</b>
+        </p>
+    </div>
+</body>
+</html>

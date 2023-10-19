@@ -1,0 +1,22 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Resumen De Sesion{% endblock title %}
+
+{% block stylesheets %}
+<link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css ' %}" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="{% static 'assets/bootstrap-touchspin-master/src/jquery.bootstrap-touchspin.css' %}">
+{% endblock stylesheets %}
+
+{% block heading %}RESUMEN{% endblock heading %}
+
+{% block content %}
+<h1>Resumen de Cierre de Caja</h1>
+<p><strong>Usuario:</strong> {{ closing.user }}</p>
+<p><strong>Fecha de Cierre:</strong> {{ closing_date }}</p>
+<p><strong>Total de Ventas del Día:</strong> {{ closing.total_sesion }}</p>
+{% endblock content %}
+
+{% block javascripts %}
+{% endblock javascripts %}

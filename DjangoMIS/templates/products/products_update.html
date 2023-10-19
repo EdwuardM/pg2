@@ -1,0 +1,112 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Actualizar producto{% endblock title %}
+
+{% block stylesheets %}
+<link href="{% static 'css/style22.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% endblock stylesheets %}
+
+{% block heading %}Actualizar producto{% endblock heading %}
+
+{% block content %}
+<!--Volver-->
+<div class="row ml-0 sty">
+    <a href="{% url 'Apps.products:products_list' %}"  style="margin-bottom: 1%;">
+        <button type="button" class="btn btn-info font-weight-bold">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+<div class="row">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.products:products_update' product.id %}"  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputDescription">Nombre</label>
+                        <input type="text" class="form-control" name="name" value="{{product.name}}" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="state">Estado</label>
+                        <select name="state" class="form-control" required>
+                            {% for status in product_status %}
+                                {% if status.0 == product.status   %}
+                                <option value="{{status.0}}" selected>{{status.1}}</option>
+                                {% else %}
+                                <option value="{{status.0}}">{{status.1}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputDescription">Descripción</label>
+                        <input type="text" name="description" class="form-control" value="{{product.description}}" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputQuantity">Cantidad</label>
+                        <input  name="quantity" step="any" class="form-control"  value="{{product.quantity}}" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="category">Categoría</label>
+                        <select name="category" class="form-control" required>
+                            <option value="" selected disabled hidden>Selecciona la categoría</option>
+                            {% for category in categories %}
+                                {% if product.category.id == category.id%}
+                                <option value="{{category.id}}" selected>{{category.name}}</option>
+                                {% else %}
+                                <option value="{{category.id}}">{{category.name}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="warehouse">Almacén</label>
+                        <select name="warehouse" class="form-control" required>
+                            <option value="" selected disabled hidden>Selecciona el almacén</option>
+                            {% for warehouse in warehouses %}
+                                {% if product.warehouse.id == warehouse.id%}
+                                <option value="{{warehouse.id}}" selected>{{warehouse.name}}</option>
+                                {% else %}
+                                <option value="{{warehouse.id}}">{{warehouse.name}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="inputPrice_buy">Precio Compra</label>
+                        <input  name="price_buy" step="any" class="form-control"  value="{{product.priceBuy}}" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputPrice">Precio</label>
+                        <input  name="price" step="any" class="form-control"  value="{{product.price}}" required>
+                    </div>
+                </div>
+                    <div id="file-photo" style="margin-bottom: 1%;">
+                        <img id="preview-image" alt="{{ product.name }}" src="{% if product.image %}{{ product.image.url }}{% endif %}">
+                        <input type="hidden" name="current_image" value="{{ product.image.url }}">
+                        <div id="image-options-container">
+                            <div id="image-options" class="hidden-options">
+                                <span id="add-option"><i class="fas fa-plus-circle"></i></span>
+                                <span id="remove-option"><i class="fas fa-trash-alt"></i></span>
+                            </div>
+                        </div>
+                        <input type="file" id="image-input" name="imagen" accept="image/*">
+                    </div>
+                <button type="submit" class="btn btn-success font-weight-bold">Actualizar producto</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="{% static 'js/photoAddPro.js' %}"></script>
+{% endblock javascripts %}

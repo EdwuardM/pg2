@@ -1,0 +1,504 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Agregar venta{% endblock title %}
+
+{% block stylesheets %}
+<link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css ' %}" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="{% static 'assets/bootstrap-touchspin-master/src/jquery.bootstrap-touchspin.css' %}">
+{% endblock stylesheets %}
+
+{% block heading %}Crear venta{% endblock heading %}
+
+{% block content %}
+<!--Volver  searchbox_products-->
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.sales:sales_list' %}">
+        <button type="button" class="btn btn-info font-weight-bold">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+<!--Venta de productos y detalle.-->
+<form action="{% url 'Apps.sales:sales_add' %}" class="saleForm" method="post">{% csrf_token %}
+    <div class="row mt-3">
+        <div class="card col-md-12">
+            <div class="card-body ml-0">
+                <div class="row">
+                    <!--Columna izquierda-->
+                    <div class="col-md-9 pl-0">
+                        <div class="card card-secondary">
+                            <div class="card-header">Productos en venta</div>
+                            <div class="card-body">
+                                <!--Buscar producto-->
+                                <div class="form-group">
+                                    <label>Buscar producto: </label>
+                                    <div class="input-group">
+                                        <select class="form-control select2" name="searchbox_products" id="searchbox_products"></select>
+                                    </div>
+                                </div>
+                                <!--Finalizar búsqueda de producto-->
+                                <!--Eliminar todos los productos de la venta-->
+                                <button type="button" class="mb-4 btn btn-danger btn-sm deleteAll">
+                                    Eliminar todo <i class="ml-1 fas fa-trash-alt fa-xs"></i>
+                                </button>
+                                <!--Fin Eliminar todos los productos de la venta-->
+                                <!--Tabla de productos-->
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table table-hover text-nowrap" id="table_products">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Nombre</th>
+                                                <th>Precio</th>
+                                                <th>Cantidad</th>
+                                                <th>Total</th>
+                                                <th class="text-center">Eliminar</th>
+                                                </tr>
+                                            </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!--Fin de Tabla de productos-->
+                            </div>
+                        </div>
+                    </div>
+                    <!--Fin de la columna izquierda-->
+                    <!--Columna derecha-->
+                    <div class="col-md-3 pr-0">
+                        <div class="card card-secondary">
+                            <div class="card-header">Detalles de venta</div>
+                            <div class="card-body">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="customer">Cliente</label>
+                                    <select name="customer" class="form-control" id="searchbox_customers" required>
+                                        <option value="" selected disabled hidden>Select the customer</option>
+                                        {% for customer in customers %}
+                                        <option value="{{customer.value}}">{{customer.label}}</option>
+                                        {% endfor %}
+                                    </select>
+                                <div class="form-group mt-4">
+                                    <label>Subtotal</label>
+                                    <div class="input-group">
+                                        <input name="sub_total" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Descuento (%)</label>
+                                    <div class="input-group">
+                                        <input name="tax_percentage" class="form-control" value=0 required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Descuento</label>
+                                    <div class="input-group">
+                                        <input name="tax_amount" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Gran total</label>
+                                    <div class="input-group">
+                                        <input name="grand_total" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Cantidad pagada</label>
+                                    <div class="input-group">
+                                        <input name="amount_payed" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-success font-weight-bold">Crear venta</button>
+                            </div>
+                            <!--Fin del cuerpo de la tarjeta-->
+                    </div>
+                    <!--Fin de la columna derecha-->
+                </div>
+                <!--Fin de fila-->
+            </div>
+            <!--Fin del cuerpo de la tarjeta-->
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
+<script src="{% static 'assets/bootstrap-touchspin-master/src/jquery.bootstrap-touchspin.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.15/dist/sweetalert2.all.min.js"></script>
+
+<<script>
+    var productsData = [
+        // Recorre tus productos de Django y crea un objeto para cada producto
+        {% for product in products %}
+            {
+                id: {{ product.id }},
+                name: "{{ product.name|escapejs }}",
+                price: {{ product.price }},
+                quantity: 1
+            },
+        {% endfor %}
+    ];
+</script>
+<script>
+    
+    // Fuente: https://stackoverflow.com/a/32605063 $(document).ready(function()
+    function roundTo(n, digits) {
+        if (digits === undefined) {
+            digits = 0;
+        }
+        var multiplicator = Math.pow(10, digits);
+        n = parseFloat((n * multiplicator).toFixed(11));
+        return Math.round(n) / multiplicator;
+    }
+    //Variable para el número de producto en la tabla
+    var number = 1;
+    //Variable para almacenar detalles de venta y productos
+    var sale = {
+        items: {
+            customer : 0, 
+            sub_total : 0.00, 
+            grand_total : 0.00, 
+            tax_amount : 0.00, 
+            tax_percentage : 0.00, 
+            amount_payed : 0.00, 
+            amount_change : 0.00,
+            products: [
+            ]
+        },
+        calculate_sale: function (){
+            // Subtotal de todos los productos agregados
+            var sub_total = 0.00
+            var tax_percentage = $('input[name="tax_percentage"]').val();
+            // Calcula el total de cada producto
+            $.each(this.items.products, function(pos, dict){
+                dict.pos = pos;  
+                dict.total_product = roundTo(dict.quantity * dict.price, 2);
+                // Suma el total del producto al subtotal de venta
+                sub_total += roundTo(dict.total_product, 2);
+            });
+            //Actualiza el subtotal de venta, el total general y el monto del impuesto
+            this.items.sub_total = roundTo(sub_total, 2);
+            this.items.tax_amount = roundTo(this.items.sub_total * (tax_percentage / 100), 2);
+            this.items.grand_total = roundTo(this.items.sub_total - this.items.tax_amount, 2);
+            $('input[name="sub_total"]').val(this.items.sub_total);
+            $('input[name="tax_amount"]').val(this.items.tax_amount);
+            $('input[name="grand_total"]').val(this.items.grand_total);
+        },
+        // Agrega un producto al objeto de venta.
+        add_product: function (item) {
+            this.items.products.push(item);
+            this.list_product();
+        },
+        //Muestra el producto seleccionado en la tabla
+        list_product: function () {
+    // Calcular la venta
+    this.calculate_sale();
+
+    // Crear una tabla DataTable con solo los productos de Django
+    var tableData = this.items.products.filter(function(item) {
+        return item.hasOwnProperty('id');
+    });
+
+    tblProducts = $("#table_products").DataTable({
+        destroy: true,
+        data: tableData,
+        columns: [
+            {"data": "number"}, 
+            {"data": "name"},
+            {"data": "price"},
+            {"data": "quantity"},
+            {"data": "total_product"},
+            {"data": "id"},
+        ],
+        columnDefs: [
+            {
+                // Cantidad
+                class: 'text-center',
+                targets: [3], 
+                render: function (data, type, row){
+                    return '<input name="quantity" type="text" class="form-control form-control-xs text-center input-sm" autocomplete="off" value="'+row.quantity+'">';
+                },                      
+            },
+            {
+                //Precio del producto en total
+                class: 'text-right',
+                targets: [2,4],
+                render: function (data, type, row){
+                    return ' Q. ' + parseFloat(data).toFixed(2);
+                },
+            },
+            {
+                //botón eliminar
+                class: 'text-center',
+                targets: [-1],
+                orderable: false,
+                render: function (data, type, row){
+                    return '<a rel="delete" type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Eliminar producto"> <i class="fas fa-trash-alt fa-xs"></i> </a>';
+                },
+            },
+        ],
+        rowCallback: function(row, data, displayNun, displayIndex, dataIndex) {
+            $(row).find(("input[name='quantity']")).TouchSpin({
+                min: 1,
+                max: 100, //Máximo de acuerdo al stock de cada producto
+                step: 1,
+                decimals: 0,
+                boostat: 1,
+                maxboostedstep: 3,
+                postfix: ''
+            });
+        },
+            })
+            // IDs de productos ya seleccionados para exlcuir en la busqueda
+            //console.log("this.traer_ids()");
+            //console.log(this.traer_ids());
+        },
+    };
+    $(document).ready(function() {
+        
+        // toque de porcentaje de impuestos
+        $("input[name='tax_percentage']").TouchSpin({
+            min: 0,
+            max: 100,
+            step: 1,
+            decimals: 2,
+            boostat: 5,
+            maxboostedstep: 10,
+            postfix: '%'
+        }).on('change', function(){
+            sale.calculate_sale();
+        });
+        // Select2 clientes
+        $('#searchbox_customers').select2({
+            placeholder: "Seleccionar Cliente",
+            allowClear: true,
+        });
+        // Tablas de Eventos
+        $('#table_products tbody').on('click', 'a[rel="delete"]', function () {
+                var tr = tblProducts.cell($(this).closest('td, li')).index();
+                product_name = (tblProducts.row(tr.row).data().name)
+                Swal.fire({
+                    customClass: {
+                        confirmButton: 'ml-3 btn btn-danger',
+                        cancelButton: 'btn btn-info'
+                    },
+                    buttonsStyling: false,
+                    title: "¿Estás seguro de que quieres eliminar este producto de la venta?",
+                    text: product_name,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Eliminar',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                }).then((result) => {
+                    // Si se confirma
+                    if (result.isConfirmed) {
+                        // Eliminar el producto
+                        sale.items.products.splice(tr.row, 1);
+                        //Listar la tabla nuevamente
+                        sale.list_product();
+                        Swal.fire('¡El producto fue eliminado!', '', 'exitosamente')
+                    };
+                })
+            }).on('change keyup', 'input[name="quantity"]', function(){
+                // Cuando un producto cambia es cantidad
+                var quantity = parseInt($(this).val());
+                //console.log(cantidad);
+                // Variable de fila de la tabla
+                var tr = tblProducts.cell($(this).closest('td, li')).index();
+                console.log(tr);
+                //var datos = tblProductos.row(tr.row).node();
+                //console.log(datos);
+                //Actualiza la cantidad de producto en el objeto de venta
+                sale.items.products[tr.row].quantity = quantity;
+                console.log(sale.items.products);
+                // Calcular la venta con la nueva cantidad
+                sale.calculate_sale();
+                // Encuentra la fila para actualizar el total del producto
+                $('td:eq(4)', tblProducts.row(tr.row).node()).html('Q. ' + sale.items.products[tr.row].total_product);
+        });
+        /// Eliminar todos los productoss
+        $('.deleteAll').on('click', function(){
+            // Si no hay productos no hace nada
+            if(sale.items.products.length === 0 ) return false;
+            // Alertar al usuario
+            Swal.fire({
+                customClass: {
+                    confirmButton: 'ml-3 btn btn-danger',
+                    cancelButton: 'btn btn-info'
+                },
+                buttonsStyling: false,
+                title: "¿Estás seguro de que deseas eliminar todos los productos de la venta?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Eliminar Todo',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+            }).then((result) => {
+                // Si se confirma
+                if (result.isConfirmed) {
+                    // Borramos todos los productos del objeto de venta
+                    sale.items.products = [];
+                    // Calculamos de vuelta la factura
+                    sale.list_product();
+                    Swal.fire('¡Todos los productos fueron eliminados!', '', 'exitosamente')
+                };
+            })
+        });
+        //Selecciona el cuadro de búsqueda de 2 productos
+        // Validar el csrf_token
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        function csrfSafeMethod(method) {
+            // estos métodos HTTP no requieren protección CSRF
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        // Para evitar el error 403 Prohibido
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        $('#searchbox_products').select2({
+            delay: 250,
+            placeholder: 'Buscar producto',
+            minimumInputLength: 1,
+            allowClear: true,
+            templateResult: template_product_searchbox,
+            ajax:{ 
+                url: "{% url 'Apps.products:get_products' %}",
+                type: 'POST',
+                data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    //excluir_prod_seleccionados: JSON.stringify(venta.traer_ids())
+                }
+                return queryParameters;
+                },
+                processResults: function (data) {
+                    console.log(data)
+                    return {
+                        results: data
+                    };
+                },
+            }
+            }).on('select2:select', function (e) {
+                //Cuando se selecciona un producto en el cuadro de búsqueda
+                var data = e.params.data;
+                //Añadir número, subtotal y cantidad del producto al diccionario
+                data.number = number;
+                number++; //Aumentar el número de producto en la tabla
+                //datos.sub_total = 0;
+                //datos.cantidad = 1;
+                //Añadir el producto al objeto de venta
+                sale.add_product(data);
+                console.log("Sale items");      
+                console.log(sale.items);      
+                //Limpiar el cuadro de búsqueda después de seleccionar el producto
+                $(this).val('').trigger('change.select2');; 
+            });
+            // tabla de datos de productos
+            tblProducts = $('#table_products').DataTable({
+                columnDefs: [
+                    {
+                        targets: [-1], // índice de columna (comienza desde 0)
+                        orderable: false, // establece ordenable falso para las columnas seleccionadas
+                    }
+                ],
+            });
+            
+        });
+        // Resultado de la plantilla del cuadro de búsqueda del producto
+        function template_product_searchbox(repo) {
+            if (repo.loading) {
+                return repo.text;
+            }
+            var option = $(
+                '<div class="wrapper container">'+
+                ' <div class="row">' +
+                    '<div class="col-lg-11 text-left shadow-sm">' +
+                      //'<br>' +
+                    '<p style="margin-bottom: 5px;">' +
+                    '<b>Nombre:</b> ' + repo.text + " | Categoria: " + "<span class='btn-info px-2'>" + repo.category + '</span> <br>' +
+                    '<b>Precio:</b> <span class="btn-success px-2">'+' Q. </span>'+repo.price+
+                    '</p>' +
+                    '</div>' +
+                '</div>' +
+                '</div>');
+            return option;
+        }
+        //Envía la venta vía ajax
+        $('.saleForm').on('submit', function (e) {  
+            // Only allow to send if we have at least one product
+            if (sale.items.products.length === 0 ) {
+                Swal.fire({
+                    title: 'La venta debe tener al menos 1 producto.',
+                    text: 'Busca un producto y agrégalo a la venta.',
+                    icon: 'warning',
+                });
+                return false;
+            };
+            // Solo permite enviar si el monto pagado es igual o mayor al total
+            if ($('[name="amount_payed"]').val() <= $('[name="grand_total"]').val()) {
+                Swal.fire({
+                    title: 'El monto a pagar es menor que el total general',
+                    icon: 'warning',
+                });
+                return false;
+            }
+            // Agregamos los datos faltantes al objeto sales
+            sale.items.customer = $('select[name="customer"]').val();
+            console.log("Customer: " + sale.items.customer)
+            sale.items.sub_total = $('input[name="sub_total"]').val(); 
+            sale.items.grand_total = $('input[name="grand_total"]').val();
+            sale.items.tax_amount = $('input[name="tax_amount"]').val(); 
+            sale.items.tax_percentage = $('input[name="tax_percentage"]').val();
+            sale.items.amount_payed = $('input[name="amount_payed"]').val(); 
+            sale.items.amount_change = roundTo($('input[name="amount_payed"]').val() - $('input[name="grand_total"]').val(), 2); 
+            // Validar el csrf_token
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+            function csrfSafeMethod(method) {
+            // estos métodos HTTP no requieren protección CSRF
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+            $.ajax({
+                url: "{% url 'Apps.sales:sales_add' %}",
+                type: "POST",
+                // Necesitamos convertir la venta del objeto JS a una cadena
+                data: JSON.stringify(sale.items), 
+                datatype: "json",
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    console.log("Ajax OK")
+                },
+                error: function (error) {
+                    console.log("Ajax error");
+                    console.log(error);
+                },
+            }).done(function (data){
+                console.log ("Ajax Done");
+            }).fail(function (data, jqXHR, textStatus, errorThrown){
+                console.log ("Ajax Fail");
+                alert(textStatus + ':' + errorThrown);
+            });
+            
+        });      
+</script>
+{% endblock javascripts %}
+

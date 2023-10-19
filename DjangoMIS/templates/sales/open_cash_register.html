@@ -1,0 +1,24 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Control de caja{% endblock title %}
+
+{% block stylesheets %}
+<link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css ' %}" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="{% static 'assets/bootstrap-touchspin-master/src/jquery.bootstrap-touchspin.css' %}">
+{% endblock stylesheets %}
+
+{% block heading %}CONTROL DE EFECTIVO DE APERTURA{% endblock heading %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    <label for="initial_amount">Efectivo de Apertura:</label>
+    <input type="number" placeholder="0" name="initial_amount" required> 
+    <button type="submit" class="btn btn-success font-weight-bold" >Abrir Sesion</button>
+</form>
+{% endblock content %}
+
+{% block javascripts %}
+{% endblock javascripts %}

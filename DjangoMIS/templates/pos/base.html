@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>{% block title %}{% endblock %}</title>
+    <!-- Fuentes personalizadas para esta plantilla-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+    <!-- Estilos personalizados para esta plantilla-->
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <!--Favicon-->
+    <link rel="icon" type="image/png" href="{% static 'favicon.png' %}"/>
+    {% block stylesheets %}{% endblock stylesheets %}
+</head>
+<body id="page-top">
+    <!-- Envoltorio de página -->
+    <div id="wrapper">
+        <!-- Sidebar -->
+        {% include 'pos/sidebar.html' %}
+        <!-- Final de Sidebar -->
+        <!-- Contenedor de contenido -->
+        <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Contenido principal -->
+            <div id="content">
+                <!-- Topbar -->
+                {% include 'pos/navbar.html' %}
+                <!-- Final de Topbar -->
+                <!-- Contenido de la página de inicio -->
+                <div class="container-fluid">
+                    <!-- Encabezado de página --
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">{% block heading %}{% endblock %}</h1>
+                    </div>
+                    <!--Los mensajes aparecerán aquí-->
+                    {% include 'pos/messages.html' with messages=messages%}
+                    <!--El contenido de la página va aquí-->
+                    {% block content %}{% endblock content %}
+                </div>
+                <!-- /.contenedor-fluido -->
+            </div>
+            <!-- Fin del contenido principal -->
+            <!-- Footer -->
+            {% include 'pos/footer.html' %}
+            <!-- Final de Footer -->
+        </div>
+        <!-- Fin del contenedor de contenido -->
+    </div>
+    <!-- Contenedor de fin de página -->
+    <!-- Desplácese hasta el botón superior-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    <!-- Modal de cierre de sesión-->
+    {% include 'pos/logout_modal.html' %}
+    <!-- Fin del modo de cierre de sesión-->
+
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+    {% comment %} <script type='text/javascript' src="{% static 'js/dissapear_messages.js' %}"></script> {% endcomment %}
+    {% block javascripts %}{% endblock javascripts %}
+</body>
+</html>
